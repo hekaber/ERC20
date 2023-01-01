@@ -13,17 +13,19 @@ contract ERC20 {
     constructor(string memory _name, string memory _symbol) {
         name = _name;
         symbol = _symbol;
+
+        _mint(msg.sender, 100e18); // 100,000,000,000,000,000,000
     }
 
     function decimals() external pure returns (uint8) {
         return 18;
     }
 
-    function trasfer(address recipient, uint256 amount) external returns (bool) {
+    function transfer(address recipient, uint256 amount) external returns (bool) {
         return _transfer(msg.sender, recipient, amount);
     }
 
-    function trasferFrom(address sender, address recipient, uint256 amount) external returns (bool) {
+    function trasnferFrom(address sender, address recipient, uint256 amount) external returns (bool) {
 
         uint256 currentAllowance = allowance[sender][msg.sender];
         require(currentAllowance >= amount, "ERC20: transfer amount exceeds allowance.");
@@ -49,5 +51,12 @@ contract ERC20 {
         balanceOf[recipient] += amount;
 
         return true;
+    }
+
+    function _mint(address to, uint256 amount) internal {
+        require(to != address(0), "ERC20: mint to the zero address");
+
+        totalSupply += amount;
+        balanceOf[to] += amount;
     }
 }
