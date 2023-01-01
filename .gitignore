@@ -1,0 +1,21 @@
+**/.DS_Store
+#common
+src/*/config/env/.env
+
+#webapp
+src/web-app/node_modules
+
+# Hardhat files
+src/solidity/coverage
+src/solidity/coverage.json
+src/solidity/typechain
+src/solidity/typechain-types
+src/solidity/cache
+src/solidity/artifacts
+*.code-workspace
+src/config/env/.env
+src/solidity/node_modules
+
+#docker
+docker/web-app/app/*
+docker/.env

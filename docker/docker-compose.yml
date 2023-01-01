@@ -1,0 +1,23 @@
+services:
+  hardhat:
+    build:
+      context: ./hardhat-app
+    container_name: ${PROJECT_NAME}-hardhat-node
+    ports:
+      - 8545:8545
+    command: tail -f /dev/null
+    networks:
+      - wave-network
+  webapp:
+    build:
+      context: ./web-app
+    container_name: ${PROJECT_NAME}-webapp
+    ports:
+      - 8080:8080
+    volumes:
+      - ../src/web-app/src:/usr/src/app/src
+    networks:
+      - wave-network
+
+networks:
+  wave-network: {}
