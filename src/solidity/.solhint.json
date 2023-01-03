@@ -2,6 +2,7 @@
   "extends": "solhint:recommended",
   "plugins": [],
   "rules": {
+    "compiler-fixed": "warn",
     "avoid-suicide": "error",
     "avoid-sha3": "warn"
   }

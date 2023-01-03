@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.17;
+import "hardhat/console.sol";
+
 
 contract ERC20 {
     uint256 public totalSupply;
@@ -47,6 +49,18 @@ contract ERC20 {
         return true;
     }
 
+    function deposit() public payable returns (bool) {
+
+        _mint(msg.sender, msg.value);
+        return true;
+    }
+
+    function redeem() public payable returns (bool) {
+
+        _burn(msg.sender, msg.value);
+        return true;
+    }
+
     function _transfer(address sender, address recipient, uint256 amount) private returns (bool) {
         require(recipient != address(0), "ERC20: transfer to the zero address");
         uint256 senderBalance = balanceOf[msg.sender];
@@ -66,5 +80,18 @@ contract ERC20 {
         balanceOf[to] += amount;
 
         emit Transfer(address(0), to, amount);
+    }
+
+    function _burn(address from, uint256 amount) internal {
+        require(from != address(0), "ERC20: burn from the zero address");
+
+        require(totalSupply >= amount, "ERC20: Redeem amount exceeds total supply");
+        totalSupply -= amount;
+
+        uint256 fromBalance = balanceOf[from];
+        require(fromBalance >= amount, "ERC20: Redeem amount exceeds balance");
+        balanceOf[from] -= amount;
+
+        emit Transfer(from, address(0), amount);
     }
 }
