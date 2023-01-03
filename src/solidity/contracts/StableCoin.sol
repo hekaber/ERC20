@@ -3,16 +3,18 @@
 pragma solidity 0.8.17;
 import { ERC20 } from "./ERC20.sol";
 import { DepositorCoin } from "./DepositorCoin.sol";
+import { Oracle } from "./Oracle.sol";
 
 
 contract StableCoin is ERC20 {
 
     DepositorCoin public depositorCoin;
+    Oracle public oracle;
     uint256 public feeRatePercentage;
-    uint256 private constant ETH_IN_USD_PRICE = 2000;
 
-    constructor(uint256 _feeRatePercentage) ERC20("StableCoin", "STC") {
+    constructor(uint256 _feeRatePercentage, Oracle _oracle) ERC20("StableCoin", "STC") {
         feeRatePercentage = _feeRatePercentage;
+        oracle = _oracle;
     }
 
     function mint() external payable {
@@ -20,7 +22,7 @@ contract StableCoin is ERC20 {
         uint256 fee = _getFee(msg.value);
         uint256 remainingEth = msg.value - fee;
 
-        uint256 mintStableCoinAmount = msg.value * ETH_IN_USD_PRICE;
+        uint256 mintStableCoinAmount = msg.value * oracle.getPrice();
         _mint(msg.sender, mintStableCoinAmount);
     }
 
@@ -28,7 +30,7 @@ contract StableCoin is ERC20 {
 
         _burn(msg.sender, burnStableCoinAmount);
 
-        uint256 refundingEth = burnStableCoinAmount / ETH_IN_USD_PRICE;
+        uint256 refundingEth = burnStableCoinAmount / oracle.getPrice();
         uint256 fee = _getFee(refundingEth);
         uint256 remainingRefundingEth = refundingEth - fee;
 
