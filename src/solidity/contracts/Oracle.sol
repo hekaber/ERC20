@@ -2,7 +2,6 @@
 
 pragma solidity 0.8.17;
 
-
 contract Oracle {
     address public owner;
     uint256 private price;
@@ -16,7 +15,10 @@ contract Oracle {
     }
 
     function setPrice(uint256 newPrice) external {
-        require(msg.sender == owner, "Oracle: only the owner can set the price.");
+        require(
+            msg.sender == owner,
+            "Oracle: only the owner can set the price."
+        );
         price = newPrice;
     }
 }
