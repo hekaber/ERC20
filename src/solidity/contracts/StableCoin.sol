@@ -9,6 +9,8 @@ import {WadLib} from "./libs/WadLib.sol";
 contract StableCoin is ERC20 {
     using WadLib for uint256;
 
+    error InitialCollateralRationError(string message, uint256 minimumDepositAmount);
+
     DepositorCoin public depositorCoin;
     Oracle public oracle;
     uint256 public feeRatePercentage;
@@ -62,10 +64,13 @@ contract StableCoin is ERC20 {
             uint256 requiredInitialSurplusInEth = requiredInitialSurplusInUsd /
                 usdInEthPrice;
 
-            require(
-                msg.value >= deficitInEth + requiredInitialSurplusInEth,
-                "STC: Initial collateral ratio not met"
-            );
+            if(msg.value < deficitInEth + requiredInitialSurplusInEth) {
+                uint256 minimumDepositAmount = deficitInEth + requiredInitialSurplusInEth;
+                revert InitialCollateralRatioError(
+                    "STC: Initial collateral ratio not met, minimum is ",
+                    minimumDepositAmount
+                );
+            }
             // why? because the amount we are sending now is substracted with the deficit
             // pay attention that if msg.value is lte deficitInEth, transaction will be reverted (underflow),
             // we add INITIAL_COLLATERAL_RATIO_PERCENTAGE to be more secure about this
