@@ -4,6 +4,23 @@
   "rules": {
     "compiler-fixed": "warn",
     "avoid-suicide": "error",
-    "avoid-sha3": "warn"
+    "avoid-sha3": "warn",
+    "compiler-version": [
+      "error",
+      "^0.8.17"
+    ],
+    "func-visibility": [
+      "warn",
+      {
+        "ignoreConstructors": true
+      }
+    ],
+    "reason-string": [
+      "warn",
+      {
+        "maxLength": 64
+      }
+    ],
+    "avoid-low-level-calls": "off"
   }
 }
