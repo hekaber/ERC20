@@ -9,7 +9,11 @@ contract ERC20 {
     string public symbol;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(address indexed owner, address indexed spender, uint256 value);
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
 
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
@@ -18,21 +22,30 @@ contract ERC20 {
         name = _name;
         symbol = _symbol;
 
-        _mint(msg.sender, 100e18); // 100,000,000,000,000,000,000
+        // _mint(msg.sender, 100e18); // 100,000,000,000,000,000,000
     }
 
     function decimals() external pure returns (uint8) {
         return 18;
     }
 
-    function transfer(address recipient, uint256 amount) external returns (bool) {
+    function transfer(address recipient, uint256 amount)
+        external
+        returns (bool)
+    {
         return _transfer(msg.sender, recipient, amount);
     }
 
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool) {
-
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external returns (bool) {
         uint256 currentAllowance = allowance[sender][msg.sender];
-        require(currentAllowance >= amount, "ERC20: transfer amount exceeds allowance.");
+        require(
+            currentAllowance >= amount,
+            "ERC20: transfer amount exceeds allowance."
+        );
         allowance[sender][msg.sender] = currentAllowance - amount;
         emit Approval(sender, msg.sender, amount);
 
@@ -40,7 +53,6 @@ contract ERC20 {
     }
 
     function approve(address spender, uint256 amount) external returns (bool) {
-
         require(spender != address(0), "ERC20: approve to the zero address");
         allowance[msg.sender][spender] = amount;
 
@@ -49,22 +61,27 @@ contract ERC20 {
     }
 
     function deposit() public payable returns (bool) {
-
         _mint(msg.sender, msg.value);
         return true;
     }
 
     function redeem() public payable returns (bool) {
-
         _burn(msg.sender, msg.value);
         return true;
     }
 
-    function _transfer(address sender, address recipient, uint256 amount) private returns (bool) {
+    function _transfer(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) private returns (bool) {
         require(recipient != address(0), "ERC20: transfer to the zero address");
         uint256 senderBalance = balanceOf[msg.sender];
 
-        require(senderBalance >= amount, "ERC20: Transfert amount exceeds balance");
+        require(
+            senderBalance >= amount,
+            "ERC20: Transfert amount exceeds balance"
+        );
         balanceOf[sender] = senderBalance - amount;
         balanceOf[recipient] += amount;
 
@@ -84,7 +101,10 @@ contract ERC20 {
     function _burn(address from, uint256 amount) internal {
         require(from != address(0), "ERC20: burn from the zero address");
 
-        require(totalSupply >= amount, "ERC20: Redeem amount exceeds total supply");
+        require(
+            totalSupply >= amount,
+            "ERC20: Redeem amount exceeds total supply"
+        );
         totalSupply -= amount;
 
         uint256 fromBalance = balanceOf[from];

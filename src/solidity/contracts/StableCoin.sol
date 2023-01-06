@@ -6,10 +6,15 @@ import {DepositorCoin} from "./DepositorCoin.sol";
 import {Oracle} from "./Oracle.sol";
 import {WadLib} from "./libs/WadLib.sol";
 
+import "hardhat/console.sol";
+
 contract StableCoin is ERC20 {
     using WadLib for uint256;
 
-    error InitialCollateralRationError(string message, uint256 minimumDepositAmount);
+    error InitialCollateralRatioError(
+        string message,
+        uint256 minimumDepositAmount
+    );
 
     DepositorCoin public depositorCoin;
     Oracle public oracle;
@@ -51,6 +56,7 @@ contract StableCoin is ERC20 {
     }
 
     function depositCollateralBuffer() external payable {
+        // console.log("I got that amount %d", msg.value);
         int256 deficitOrSurplusInUsd = _getDeficitOrSurplusInContractInUsd();
 
         if (deficitOrSurplusInUsd <= 0) {
@@ -63,9 +69,15 @@ contract StableCoin is ERC20 {
                     totalSupply) / 100;
             uint256 requiredInitialSurplusInEth = requiredInitialSurplusInUsd /
                 usdInEthPrice;
-
-            if(msg.value < deficitInEth + requiredInitialSurplusInEth) {
-                uint256 minimumDepositAmount = deficitInEth + requiredInitialSurplusInEth;
+            // console.log(
+            //     "Msg.value: %d, deficitEth %d, requiredInitialSurplusInEth %d ",
+            //     msg.value,
+            //     deficitInEth,
+            //     requiredInitialSurplusInEth
+            // );
+            if (msg.value < deficitInEth + requiredInitialSurplusInEth) {
+                uint256 minimumDepositAmount = deficitInEth +
+                    requiredInitialSurplusInEth;
                 revert InitialCollateralRatioError(
                     "STC: Initial collateral ratio not met, minimum is ",
                     minimumDepositAmount
@@ -79,9 +91,16 @@ contract StableCoin is ERC20 {
                 usdInEthPrice;
 
             // for a deficit, we destroy the previous depositorCoin and we do that by creating a new contract
+            // console.log("MSG sender before contract creation %s", msg.sender);
+            // console.log("Address of this %s", address(this));
             depositorCoin = new DepositorCoin();
+            // console.log(
+            //     "Created depositCoin contract with owner %s, Message sender is %s",
+            //     depositorCoin.owner(),
+            //     msg.sender
+            // );
             uint256 mintDepositorCoinAmount = newInitialSurplusInUsd;
-            depositorCoin.mint(msg.sender, mintDepositorCoinAmount);
+            // depositorCoin.mint(msg.sender, mintDepositorCoinAmount);
 
             return;
         }
@@ -96,7 +115,8 @@ contract StableCoin is ERC20 {
 
         // depositor coin in usd price
         WadLib.Wad dpcInUsdPrice = _getDpcInUsdPrice(surplusInUsd);
-        uint256 mintDepositorCoinAmount = msg.value.mulWad(dpcInUsdPrice) / oracle.getPrice();
+        uint256 mintDepositorCoinAmount = msg.value.mulWad(dpcInUsdPrice) /
+            oracle.getPrice();
 
         depositorCoin.mint(msg.sender, mintDepositorCoinAmount);
     }
@@ -119,9 +139,13 @@ contract StableCoin is ERC20 {
         uint256 refundingInUsd = burnDepositorCoinAmount.mulWad(dpcInUsdPrice);
         uint256 refundingInEth = refundingInUsd / oracle.getPrice();
 
-        (bool success, ) = msg.sender.call{value: refundingEth}("");
+        (bool success, ) = msg.sender.call{value: refundingInEth}("");
 
         require(success, "STC: Withdraw refund transaction failed");
+    }
+
+    function getAddress() public view returns (address) {
+        return address(this);
     }
 
     function _getFee(uint256 ethAmount) private view returns (uint256) {
@@ -134,7 +158,11 @@ contract StableCoin is ERC20 {
         return (feeRatePercentage * ethAmount) / 100;
     }
 
-    function _getDeficitOrSurplusInContractInUsd() private view reurns(int256) {
+    function _getDeficitOrSurplusInContractInUsd()
+        private
+        view
+        returns (int256)
+    {
         uint256 ethContractBalanceInUsd = (address(this).balance - msg.value) *
             oracle.getPrice();
         // no conversion, the stableCoin is in usd
