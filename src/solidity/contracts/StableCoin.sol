@@ -56,7 +56,6 @@ contract StableCoin is ERC20 {
     }
 
     function depositCollateralBuffer() external payable {
-        // console.log("I got that amount %d", msg.value);
         int256 deficitOrSurplusInUsd = _getDeficitOrSurplusInContractInUsd();
 
         if (deficitOrSurplusInUsd <= 0) {
@@ -69,12 +68,7 @@ contract StableCoin is ERC20 {
                     totalSupply) / 100;
             uint256 requiredInitialSurplusInEth = requiredInitialSurplusInUsd /
                 usdInEthPrice;
-            // console.log(
-            //     "Msg.value: %d, deficitEth %d, requiredInitialSurplusInEth %d ",
-            //     msg.value,
-            //     deficitInEth,
-            //     requiredInitialSurplusInEth
-            // );
+
             if (msg.value < deficitInEth + requiredInitialSurplusInEth) {
                 uint256 minimumDepositAmount = deficitInEth +
                     requiredInitialSurplusInEth;
@@ -91,16 +85,9 @@ contract StableCoin is ERC20 {
                 usdInEthPrice;
 
             // for a deficit, we destroy the previous depositorCoin and we do that by creating a new contract
-            // console.log("MSG sender before contract creation %s", msg.sender);
-            // console.log("Address of this %s", address(this));
             depositorCoin = new DepositorCoin();
-            // console.log(
-            //     "Created depositCoin contract with owner %s, Message sender is %s",
-            //     depositorCoin.owner(),
-            //     msg.sender
-            // );
             uint256 mintDepositorCoinAmount = newInitialSurplusInUsd;
-            // depositorCoin.mint(msg.sender, mintDepositorCoinAmount);
+            depositorCoin.mint(msg.sender, mintDepositorCoinAmount);
 
             return;
         }

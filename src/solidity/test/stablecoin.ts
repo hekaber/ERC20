@@ -95,10 +95,10 @@ describe("StableCoin", function () {
                 await StableCoin.depositorCoin()
             );
 
-            // const newInitialSurplusInUsd = stableCoinCollateralBuffer * ethUsdPrice;
-            // expect(await DepositorCoin.totalSupply()).to.equal(
-            //     ethers.utils.parseEther(newInitialSurplusInUsd.toString())
-            // );
+            const newInitialSurplusInUsd = stableCoinCollateralBuffer * ethUsdPrice;
+            expect(await DepositorCoin.totalSupply()).to.equal(
+                ethers.utils.parseEther(newInitialSurplusInUsd.toString())
+            );
         });
 
         // describe("With deposited collateral buffer", function () {
