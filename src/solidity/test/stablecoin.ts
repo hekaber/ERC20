@@ -101,41 +101,41 @@ describe("StableCoin", function () {
             );
         });
 
-        // describe("With deposited collateral buffer", function () {
-        //     let stableCoinCollateralBuffer: number;
-        //     let DepositorCoin: DepositorCoin;
+        describe("With deposited collateral buffer", function () {
+            let stableCoinCollateralBuffer: number;
+            let DepositorCoin: DepositorCoin;
 
-        //     this.beforeEach(async () => {
-        //         stableCoinCollateralBuffer = 0.5;
-        //         await StableCoin.depositCollateralBuffer({
-        //             value: ethers.utils.parseEther(stableCoinCollateralBuffer.toString()),
-        //         });
+            this.beforeEach(async () => {
+                stableCoinCollateralBuffer = 0.5;
+                await StableCoin.depositCollateralBuffer({
+                    value: ethers.utils.parseEther(stableCoinCollateralBuffer.toString()),
+                });
 
-        //         const DepositorCoinFactory = await ethers.getContractFactory(
-        //             "DepositorCoin"
-        //         );
-        //         DepositorCoin = await DepositorCoinFactory.attach(
-        //             await StableCoin.depositorCoin()
-        //         );
-        //     });
+                const DepositorCoinFactory = await ethers.getContractFactory(
+                    "DepositorCoin"
+                );
+                DepositorCoin = await DepositorCoinFactory.attach(
+                    await StableCoin.depositorCoin()
+                );
+            });
 
-        //     it("Should allow withdrawing collateral buffer", async function () {
-        //         const newDepositorTotalSupply =
-        //             stableCoinCollateralBuffer * ethUsdPrice;
-        //         const stableCoinCollateralBurnAmount = newDepositorTotalSupply * 0.2;
+            it("Should allow withdrawing collateral buffer", async function () {
+                const newDepositorTotalSupply =
+                    stableCoinCollateralBuffer * ethUsdPrice;
+                const stableCoinCollateralBurnAmount = newDepositorTotalSupply * 0.2;
 
-        //         await StableCoin.withdrawCollateralBuffer(
-        //             ethers.utils.parseEther(stableCoinCollateralBurnAmount.toString())
-        //         );
+                await StableCoin.withdrawCollateralBuffer(
+                    ethers.utils.parseEther(stableCoinCollateralBurnAmount.toString())
+                );
 
-        //         expect(await DepositorCoin.totalSupply()).to.equal(
-        //             ethers.utils.parseEther(
-        //                 (
-        //                     newDepositorTotalSupply - stableCoinCollateralBurnAmount
-        //                 ).toString()
-        //             )
-        //         );
-        //     });
-        // });
+                expect(await DepositorCoin.totalSupply()).to.equal(
+                    ethers.utils.parseEther(
+                        (
+                            newDepositorTotalSupply - stableCoinCollateralBurnAmount
+                        ).toString()
+                    )
+                );
+            });
+        });
     });
 });
