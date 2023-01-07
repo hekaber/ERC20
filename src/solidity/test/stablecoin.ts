@@ -119,6 +119,14 @@ describe("StableCoin", function () {
                 );
             });
 
+            it("Should have the new total supply", async function () {
+                const newDepositorTotalSupply =
+                    stableCoinCollateralBuffer * ethUsdPrice;
+                expect(await DepositorCoin.totalSupply()).to.equal(
+                    ethers.utils.parseEther(newDepositorTotalSupply.toString())
+                );
+            });
+
             it("Should allow withdrawing collateral buffer", async function () {
                 const newDepositorTotalSupply =
                     stableCoinCollateralBuffer * ethUsdPrice;
